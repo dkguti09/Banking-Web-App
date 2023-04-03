@@ -1,28 +1,18 @@
-pipeline {
-    agent any
+node {
+  stage("Clone the project") {
+    git branch: 'main', url: 'https://github.com/dkguti09/Banking-Web-App.git'
+  }
 
-    stages {
-        stage('Build')
-        {
-            steps 
-            {
-                echo 'Build App'
-            }
-        }
-         stage('Test')
-        {
-            steps 
-            {
-                echo 'Test App'
-            }
-        }
-         stage('Deploy')
-        {
-            steps 
-            {
-                echo 'Deploy App'
-            }
-        }
-        
+  stage("Compilation") {
+    sh "./mvnw clean install -DskipTests"
+  }
+
+  stage("Tests and Deployment") {
+    stage("Runing unit tests") {
+      sh "./mvnw test -Punit"
     }
+    stage("Deployment") {
+      sh 'nohup ./mvnw spring-boot:run -Dserver.port=8001 &'
+    }
+  }
 }
